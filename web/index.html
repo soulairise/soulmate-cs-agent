@@ -57,6 +57,15 @@ button{
   background:var(--sage);color:#fff;cursor:pointer;
 }
 button:disabled{opacity:.5;cursor:default}
+.banner{
+  padding:9px 16px;font-size:13px;line-height:1.5;color:var(--muted);
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+.gate{padding:24px 16px;max-width:420px;margin:0 auto;text-align:center}
+.gate h2{font-size:17px;margin:0 0 6px}
+.gate p{font-size:14px;color:var(--muted);margin:0 0 16px}
+.gate form{border:0;padding:0;background:0;position:static}
+.gate .err{color:var(--warn);font-size:13px;margin-top:10px;min-height:19px}
 .chips{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 2px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{
@@ -76,6 +85,17 @@ button:disabled{opacity:.5;cursor:default}
   <h1>소울매트 고객응대</h1>
   <p>요가용품 · 수업/워크숍 문의를 도와드립니다</p>
 </header>
+<div class="banner">데모입니다 — 계좌·연락처·신청 주소는 모두 가짜 값이고, 상품·주문·세션은 목업 데이터입니다.</div>
+
+<div class="gate" id="gate" hidden>
+  <h2>접속코드를 입력해 주세요</h2>
+  <p>팀원에게 공유된 코드를 넣으시면 됩니다.</p>
+  <form id="gf">
+    <input id="gc" placeholder="접속코드" autocomplete="off" required>
+    <button>확인</button>
+  </form>
+  <div class="err" id="ge"></div>
+</div>
 
 <div class="chips" id="chips"></div>
 <div id="log"></div>
@@ -89,6 +109,29 @@ button:disabled{opacity:.5;cursor:default}
 const log=document.getElementById('log'), f=document.getElementById('f'),
       q=document.getElementById('q'), send=document.getElementById('send');
 let thread=null;
+let CODE = localStorage.getItem('sm_code') || '';
+const gate=document.getElementById('gate'), gf=document.getElementById('gf'),
+      gc=document.getElementById('gc'), ge=document.getElementById('ge'),
+      chipsEl=document.getElementById('chips');
+
+function showGate(on){
+  gate.hidden=!on;
+  [chipsEl, log, f].forEach(el=>el.style.display = on ? 'none' : '');
+  if(on) gc.focus();
+}
+
+gf.addEventListener('submit', async e=>{
+  e.preventDefault();
+  CODE=gc.value.trim(); ge.textContent='';
+  const r=await fetch('/api/chat',{method:'POST',
+    headers:{'Content-Type':'application/json','X-Access-Code':CODE},
+    body:JSON.stringify({question:'안녕하세요'})});
+  if(r.status===401){ ge.textContent='코드가 맞지 않습니다.'; return; }
+  localStorage.setItem('sm_code', CODE);
+  showGate(false);
+});
+
+fetch('/api/need-code').then(r=>r.json()).then(d=>{ if(d.required && !CODE) showGate(true); });
 
 const SAMPLES=["TPE 매트 두께가 몇 mm인가요?","싱잉볼 수업 자리 있나요?",
   "행사 5일 전에 취소하면 얼마 돌려받나요?","SM-0002 지금 어디쯤 왔나요?",
@@ -122,8 +165,10 @@ f.addEventListener('submit', async e=>{
   const wait=add('bot','<span class="dots"><span></span><span></span><span></span></span>');
   try{
     const r=await fetch('/api/chat',{method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','X-Access-Code':CODE},
       body:JSON.stringify({question:text, thread})});
+    if(r.status===401){ wait.remove(); localStorage.removeItem('sm_code');
+      CODE=''; showGate(true); send.disabled=false; return; }
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json(); thread=d.thread;
     wait.remove();

@@ -471,11 +471,11 @@
   "event": "소울라이즈 가을 요가 위켄드",
   "apply_deadline": "2026-10-03",
   "apply_method": "구글폼 선착순 (세션별 개별 마감)",
-  "apply_url": "https://forms.gle/VG9TBeBsDG6yFc9x7",
-  "bank": "카카오뱅크 3333-36-8612308 (황정심)",
-  "openchat": "https://open.kakao.com/o/g2Iq34Ii",
+  "apply_url": "https://example.com/apply ※데모용 가짜 주소",
+  "bank": "카카오뱅크 0000-00-0000000 (소울라이즈) ※데모용 가짜 계좌",
+  "openchat": "https://example.com/openchat ※데모용 가짜 주소",
   "openchat_code": "1010",
-  "contact": "김만영 010-5583-1623",
+  "contact": "소울매트 고객센터 000-0000-0000 ※데모용 가짜 번호",
   "confirm_rule": "입금이 확인되어야 신청이 확정됩니다.",
   "event_date_first": "2026-10-10"
  }

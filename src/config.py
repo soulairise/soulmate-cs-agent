@@ -11,7 +11,7 @@ def _load_key(path=Path.home() / ".config" / "harness-lab" / "env"):
     키를 저장소에 두지 않기 위한 장치다. 읽기만 하고 쓰지 않으며, 파일이 없으면 조용히 넘어간다
     (그 경우 OPENAI_API_KEY 를 직접 export 해야 한다).
     """
-    if os.environ.get("OPENAI_API_KEY") or not path.exists():
+    if not path.exists():
         return
     for line in path.read_text().splitlines():
         line = line.strip()
@@ -23,6 +23,7 @@ def _load_key(path=Path.home() / ".config" / "harness-lab" / "env"):
 
 
 _load_key()
+_load_key(Path.home() / ".config" / "soulmate-cs-agent" / "env")   # 웹 접속코드
 
 MODEL = os.environ.get("SM_MODEL", "gpt-5.6-luna")              # 라우팅용
 ANSWER_MODEL = os.environ.get("SM_ANSWER_MODEL", "gpt-5.6-terra")  # 답변 생성용
