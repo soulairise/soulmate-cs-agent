@@ -1,0 +1,978 @@
+{
+ "conversations": [
+  {
+   "conv_id": "C-001",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "소울매트 프리미엄 TPE 매트 두께가 몇 mm인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_detail"
+      ],
+      "must": [
+       "6mm"
+      ],
+      "forbid": [],
+      "reference": "소울매트 프리미엄 TPE 매트의 두께는 6mm입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-002",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "시그니처 요가복 세트 M 사이즈는 허리 몇 인치인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_detail"
+      ],
+      "must": [
+       "27",
+       "29"
+      ],
+      "forbid": [],
+      "reference": "시그니처 요가복 세트 M 사이즈는 허리 27~29인치(66) 기준입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-003",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "코르크 요가블록 세트는 몇 개 들어있나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_detail"
+      ],
+      "must": [
+       "2개"
+      ],
+      "forbid": [],
+      "reference": "코르크 요가블록은 2개 세트로 구성되어 있습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-004",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "천연고무 매트에서 냄새가 난다던데 사실인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_detail"
+      ],
+      "must": [
+       "냄새"
+      ],
+      "forbid": [
+       "교정",
+       "치료"
+      ],
+      "reference": "천연고무 특유의 냄새가 초기에 나며, 환기하시면 2주 내에 옅어집니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-005",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "마이크로파이버 요가타월 지금 품절인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "품절"
+      ],
+      "forbid": [],
+      "reference": "마이크로파이버 요가타월은 현재 전 색상 품절입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-006",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "프리미엄 TPE 매트 라벤더 색 재고 있나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "라벤더"
+      ],
+      "forbid": [],
+      "reference": "프리미엄 TPE 매트 라벤더 색상은 현재 재고가 없습니다. 세이지그린과 차콜은 구매 가능합니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-007",
+   "route": "PRODUCT_INFO",
+   "note": "매트가 2종이라 search_product 가 ambiguous 를 돌려준다 → 되물어야 한다",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "매트 두께가 어떻게 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ASK",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "소울매트 매트는 두 종류가 있습니다. 프리미엄 TPE 매트와 천연고무 논슬립 매트 중 어느 쪽을 말씀하시는지 알려주시겠어요?"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-008",
+   "route": "PRODUCT_INFO",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "시그니처 요가복 세탁기에 돌려도 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_detail"
+      ],
+      "must": [
+       "손세탁"
+      ],
+      "forbid": [],
+      "reference": "시그니처 요가복 세트는 단독 손세탁을 권장합니다. 건조기와 섬유유연제는 사용하실 수 없습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-009",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "시그니처 요가복 세트에서 레깅스만 따로 살 수 있나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "불가"
+      ],
+      "forbid": [],
+      "reference": "시그니처 요가복 세트는 탑과 레깅스를 세트로만 판매하여 레깅스 단품 구매는 불가합니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-010",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "코르크 요가블록 하나만 구매 가능한가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "2개"
+      ],
+      "forbid": [],
+      "reference": "코르크 요가블록은 2개 세트로만 판매하여 낱개 구매는 어렵습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-011",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "천연고무 논슬립 매트 딥그린 지금 구매되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "딥그린"
+      ],
+      "forbid": [
+       "품절"
+      ],
+      "reference": "천연고무 논슬립 매트 딥그린은 현재 재고가 있어 바로 구매하실 수 있습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-012",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0001 주문 색상을 차콜로 바꿀 수 있을까요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_order_status"
+      ],
+      "must": [
+       "결제완료"
+      ],
+      "forbid": [],
+      "reference": "SM-0001 주문은 아직 결제완료 단계로 출고 전이라 색상 변경이 가능합니다. 차콜로 변경 접수해 드리겠습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-013",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0002 수량을 하나 더 늘릴 수 있나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_order_status"
+      ],
+      "must": [
+       "배송중"
+      ],
+      "forbid": [],
+      "reference": "SM-0002 주문은 이미 배송중이라 수량 변경이 어렵습니다. 추가 구매는 새 주문으로 진행해 주시고, 합배송은 어려운 점 양해 부탁드립니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-014",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "주문하려는데 어떤 상품인지 말씀 안 드렸네요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ASK",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "어떤 상품을 주문하시려는지 상품명을 알려주시겠어요?"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-015",
+   "route": "ORDER_PLACE",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "마이크로파이버 요가타월 지금 주문 가능한가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_product",
+       "get_product_options"
+      ],
+      "must": [
+       "품절"
+      ],
+      "forbid": [],
+      "reference": "마이크로파이버 요가타월은 현재 품절이라 주문이 어렵습니다. 재입고 예정일은 9월 29일입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-016",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "7만원어치 사면 배송비 무료인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "무료"
+      ],
+      "forbid": [],
+      "reference": "네, 5만원 이상 구매 시 무료배송이라 7만원 주문은 배송비가 무료입니다.",
+      "_note": "매뉴얼 [확정] 값이라 도구 호출을 요구하지 않는다 (ANSWER_RULES 1번)"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-017",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "배송비가 얼마인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "3500"
+      ],
+      "forbid": [],
+      "reference": "기본 배송비는 3,500원이며, 5만원 이상 구매 시 무료입니다.",
+      "_note": "매뉴얼 [확정] 값이라 도구 호출을 요구하지 않는다 (ANSWER_RULES 1번)"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-018",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0002 주문 지금 어디쯤 왔나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_order_status"
+      ],
+      "must": [
+       "옥천"
+      ],
+      "forbid": [],
+      "reference": "SM-0002 주문은 CJ대한통운으로 배송중이며 현재 옥천HUB에서 발송된 상태입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-019",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0005 송장번호 알려주세요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_order_status"
+      ],
+      "must": [
+       "555544443333"
+      ],
+      "forbid": [],
+      "reference": "SM-0005 주문의 송장번호는 CJ대한통운 555544443333입니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-020",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "주문 배송이 어디쯤인지 궁금해요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ASK",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "주문 조회를 위해 주문번호(SM-0000 형태)를 알려주시겠어요?"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-021",
+   "route": "SHIPPING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0003 배송 완료됐나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_order_status"
+      ],
+      "must": [
+       "9월 10일"
+      ],
+      "forbid": [],
+      "reference": "SM-0003 주문은 9월 10일에 배송완료되었습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-022",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0003 반품 접수했는데 언제 환불되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_return_status"
+      ],
+      "must": [
+       "검품"
+      ],
+      "forbid": [
+       "고객 부담",
+       "소울매트 부담"
+      ],
+      "reference": "SM-0003 반품은 현재 수거완료 상태로 검품이 진행 중입니다. 검품이 끝나야 환불 금액과 비용 부담 주체가 확정되어, 지금은 단정해 말씀드리기 어렵습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-023",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "SM-0002 교환 진행 상황 알려주세요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_return_status"
+      ],
+      "must": [
+       "검품",
+       "소울매트"
+      ],
+      "forbid": [],
+      "reference": "SM-0002 교환 건은 검품완료 상태이며 판매자 귀책으로 확인되어 배송비는 소울매트가 부담합니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-024",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "받은 지 10일 됐는데 단순변심으로 반품 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "7일"
+      ],
+      "forbid": [],
+      "reference": "단순 변심 반품은 수령일로부터 7일 이내에만 가능하여 10일이 지난 건은 접수가 어렵습니다.",
+      "_note": "매뉴얼 [확정] 값이라 도구 호출을 요구하지 않는다 (ANSWER_RULES 1번)"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-025",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "양말 한 번 신어봤는데 반품 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "위생"
+      ],
+      "forbid": [],
+      "reference": "요가양말은 위생용품이라 착용하신 경우 반품이 어렵습니다.",
+      "_note": "매뉴얼 [확정] 값이라 도구 호출을 요구하지 않는다 (ANSWER_RULES 1번)"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-026",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "색상이 잘못 왔어요. 반품 배송비 제가 내야 하나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_return_policy"
+      ],
+      "must": [
+       "소울매트"
+      ],
+      "forbid": [
+       "고객이 부담"
+      ],
+      "reference": "오배송은 소울매트 귀책이라 반품 배송비는 소울매트가 부담합니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-027",
+   "route": "RETURN_REFUND",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "반품 신청했는데 진행 상황 알려주세요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ASK",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "반품 조회를 위해 주문번호(SM-0000) 또는 반품번호(R-0000)를 알려주시겠어요?"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-028",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "싱잉볼 뇌파체험 수업 아직 자리 있나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_session",
+       "get_session_detail"
+      ],
+      "must": [
+       "마감"
+      ],
+      "forbid": [],
+      "reference": "싱잉볼 뇌파체험 세션은 정원 30명이 모두 차서 마감되었습니다. 취소석이 생기면 오픈채팅방에 공지됩니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-029",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "10월 11일 한강 야외요가는 뭘 가져가야 하나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_session",
+       "get_session_detail"
+      ],
+      "must": [
+       "돗자리"
+      ],
+      "forbid": [],
+      "reference": "10월 11일 선유도 한강 야외요가에는 요가매트 또는 돗자리, 모자, 물을 가져와 주세요."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-030",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "워크숍 참가비는 어디로 입금하면 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_event_info"
+      ],
+      "must": [
+       "카카오뱅크"
+      ],
+      "forbid": [],
+      "reference": "참가비는 카카오뱅크 3333-36-8612308 (황정심)으로 입금해 주시면 되며, 입금이 확인되어야 신청이 확정됩니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-031",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "가을 요가 위켄드 신청 마감이 언제인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_event_info"
+      ],
+      "must": [
+       "10월 3일"
+      ],
+      "forbid": [],
+      "reference": "가을 요가 위켄드 신청 마감은 10월 3일이며, 세션별 선착순으로 먼저 마감될 수 있습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-032",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "한강 요가 비 오면 어떻게 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_session",
+       "get_session_detail"
+      ],
+      "must": [
+       "702"
+      ],
+      "forbid": [],
+      "reference": "우천 시에는 702호로 장소가 변경되며, 공지는 오픈채팅방으로 안내됩니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-033",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "포트락 음식 가져가면 참가비가 달라지나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "search_session",
+       "get_session_detail"
+      ],
+      "must": [
+       "10000"
+      ],
+      "forbid": [],
+      "reference": "포트락 음식을 준비해 오시는 경우 참가비가 20,000원에서 10,000원으로 조정됩니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-034",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "수업 신청하고 싶은데요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ASK",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "어느 세션을 신청하시려는지 알려주시겠어요? 가을 요가 위켄드는 10월 10일과 11일에 네 개 세션이 열립니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-035",
+   "route": "CLASS_BOOKING",
+   "note": "매뉴얼 7.2 — 의료 판단은 절대 하지 않는다",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "허리 디스크가 있는데 아쉬탕가 프라이머리 해도 될까요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "강사"
+      ],
+      "forbid": [
+       "괜찮습니다",
+       "무리 없",
+       "가능합니다"
+      ],
+      "reference": "수련 가능 여부는 몸 상태를 직접 보고 판단해야 하는 부분이라, 담당 강사님과 상담하실 수 있도록 연결해 드리겠습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-036",
+   "route": "CLASS_BOOKING",
+   "note": "매뉴얼 7.2",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "임신 20주인데 싱잉볼 수업 들어도 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [
+       "강사"
+      ],
+      "forbid": [
+       "괜찮습니다",
+       "안전합니다",
+       "문제 없"
+      ],
+      "reference": "임신 중 수련 가능 여부는 몸 상태에 따라 달라 담당 강사님과 상담하실 수 있도록 연결해 드리겠습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-037",
+   "route": "PRODUCT_INFO",
+   "note": "매뉴얼 3.2 — 표시광고법",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "이 매트 쓰면 골반 교정되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [],
+      "must": [],
+      "forbid": [
+       "교정됩니다",
+       "교정돼",
+       "치료"
+      ],
+      "reference": "매트는 수련 시 미끄럼을 막고 관절을 받쳐 주는 용도이며, 체형 교정 효과를 말씀드릴 수는 없습니다. 자세에 관한 부분은 담당 강사님과 상담을 권해 드립니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-038",
+   "route": "OTHER",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "매장이 어디에 있나요? 직접 가서 보고 싶어요"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "OUT_OF_SCOPE",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "문의하신 내용은 소울매트에서 확인이 어려운 사항입니다. 담당 창구를 안내해 드릴 수 있도록 상담원에게 연결해 드리겠습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-039",
+   "route": "OTHER",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "쿠팡에서 주문했는데 배송이 안 와요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "OUT_OF_SCOPE",
+      "tools": [],
+      "must": [],
+      "forbid": [],
+      "reference": "문의하신 내용은 소울매트에서 확인이 어려운 사항입니다. 담당 창구를 안내해 드릴 수 있도록 상담원에게 연결해 드리겠습니다."
+     }
+    }
+   ]
+  }
+ ]
+}
