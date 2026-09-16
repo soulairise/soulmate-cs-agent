@@ -18,6 +18,7 @@ from tools import escalate_to_agent
 class AgentState(TypedDict, total=False):
     question: str
     history: Annotated[list, operator.add]   # 리듀서가 붙어 턴마다 덮이지 않고 쌓인다
+                                            # [{"role": "customer"|"agent", "text": ...}]
     route: str
     confidence: float
     action: str                 # HANDLE / ASK / ANSWER / ESCALATE / OUT_OF_SCOPE / RETRY
@@ -30,8 +31,13 @@ class AgentState(TypedDict, total=False):
 
 
 def with_history(state: AgentState) -> str:
-    """앞 턴의 발화를 앞에 붙인다. 대화가 없으면 이번 발화 그대로."""
-    prior = state.get("history") or []
+    """분류·가드레일용으로 고객 발화만 이어 붙인다.
+
+    라우팅은 "그건 얼마예요?" 같은 이어지는 말을 앞 발화 없이는 못 가른다. 그래서 여기서는
+    이어 붙이는 게 맞다. 다만 **답변 생성에는 쓰지 않는다** — 그쪽은 역할이 붙은 메시지로
+    넘겨야 지난 질문까지 다시 답하는 일이 없다 (answer_with_tools 의 history 인자).
+    """
+    prior = [t["text"] for t in (state.get("history") or []) if t["role"] == "customer"]
     return " ".join(prior + [state["question"]])
 
 
@@ -43,12 +49,15 @@ def node_route(state):
 
 def node_answer(state: AgentState) -> AgentState:
     """② 조회 + ③ 생성 — 안에서 도구 호출 그래프가 한 바퀴 돈다."""
-    text, results = answer_with_tools(with_history(state), state["route"])
+    text, results = answer_with_tools(state["question"], state["route"],
+                                      history=state.get("history") or [])
+    turn = [{"role": "customer", "text": state["question"]},
+            {"role": "agent", "text": text}]
     if not results:                       # 조회할 식별자가 없어 모델이 되물은 경우
         return {"action": "ASK", "tools": [], "results": {}, "answer": text,
-                "history": [state["question"]]}
+                "history": turn}
     return {"tools": list(results), "results": results, "answer": text,
-            "history": [state["question"]],
+            "history": turn,
             "attempts": state.get("attempts", 0) + 1}
 
 

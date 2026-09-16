@@ -3,6 +3,9 @@
 
 숫자로 안 잡히는 어색함은 직접 대화해 봐야 보인다. 종료는 빈 줄 또는 Ctrl-D.
 """
+
+import sys as _sys, pathlib as _p
+_sys.path.insert(0, str(_p.Path(__file__).resolve().parent))
 import uuid
 
 from agent import chat_app

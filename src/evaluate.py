@@ -8,6 +8,9 @@
 ③ 을 따로 뺀 이유: ①②는 높을수록 좋은 지표지만 ③은 **0이 아니면 배포하면 안 되는** 지표다.
 `--only router` / `--only answer` / `--only safety` 로 한쪽만 잴 수 있다.
 """
+
+import sys as _sys, pathlib as _p
+_sys.path.insert(0, str(_p.Path(__file__).resolve().parent))
 import argparse
 import json
 import re

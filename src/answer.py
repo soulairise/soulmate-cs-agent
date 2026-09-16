@@ -48,10 +48,18 @@ def build_tool_graph():
 tool_app = build_tool_graph()
 
 
-def answer_with_tools(question, route, max_turns=MAX_TOOL_TURNS):
-    """그래프를 한 바퀴 돌려 (답변, 호출된 도구 결과) 를 돌려준다."""
-    init = {"messages": [("system", build_answer_prompt(question, route)),
-                         ("human", question)]}
+def answer_with_tools(question, route, max_turns=MAX_TOOL_TURNS, history=None):
+    """그래프를 한 바퀴 돌려 (답변, 호출된 도구 결과) 를 돌려준다.
+
+    history 는 [{"role": "customer"|"agent", "text": ...}] 형태의 앞선 턴들이다.
+    이걸 질문 문자열에 이어 붙이면 안 된다 — 모델이 지난 질문까지 이번에 물은 것으로 읽고
+    답을 통째로 다시 말한다(실제로 그랬다). 역할이 붙은 별도 메시지로 넘겨야 한다.
+    """
+    prior = []
+    for t in history or []:
+        prior.append(("human" if t["role"] == "customer" else "ai", t["text"]))
+    init = {"messages": [("system", build_answer_prompt(question, route))]
+                        + prior + [("human", question)]}
     try:
         out = tool_app.invoke(init, {"recursion_limit": 2 * max_turns + 1})
     except GraphRecursionError:
