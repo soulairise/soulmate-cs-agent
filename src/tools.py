@@ -209,14 +209,23 @@ def get_event_info() -> dict:
 
 
 def get_class_refund_policy(session_id: Optional[str] = None,
+                           session_query: Optional[str] = None,
                            days_before: Optional[int] = None,
                            paid_amount: Optional[int] = None,
                            days_since_payment: Optional[int] = None) -> dict:
     """수업·워크숍 취소 시 환불 규정과 환불액을 조회한다 (매뉴얼 7.3 · 7.4).
 
+    **고객이 세션 이름을 말했으면 session_query 에 그 말을 그대로 넣어라**("싱잉볼", "한강 요가").
+    안에서 세션을 찾아 대기자 현황까지 함께 돌려준다 — 대기자가 있으면 시점과 무관하게
+    전액 환불이므로, 이걸 빠뜨리면 실제와 다른 금액을 안내하게 된다.
+    search_session 을 따로 부를 필요는 없다.
+
     days_before 는 행사일까지 남은 일수다. 모르면 비워 두고, 돌려받은 tiers 를 안내한 뒤
     언제 취소하시는지 되물으면 된다. 상품 반품(get_return_policy)과 혼동하지 말 것.
     """
+    if not session_id and session_query:
+        found = search_session(session_query)
+        session_id = found.get("resolved_product_id") or found.get("resolved_session_id")
     C = CONFIRMED_POLICY
     out = {
         "tiers": [
@@ -257,6 +266,9 @@ def get_class_refund_policy(session_id: Optional[str] = None,
         out["paid_amount"] = paid_amount
         out["refund_amount"] = int(paid_amount * out["refund_rate"])
 
+    if not session_id and session_query:
+        out["session_lookup"] = (f"'{session_query}' 로 세션을 특정하지 못했습니다. "
+                                 "어느 세션인지 확인하면 대기자 현황까지 안내할 수 있습니다.")
     if session_id:
         sess = SESSIONS.get(session_id)
         if not sess:

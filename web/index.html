@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>소울매트 고객응대</title>
+<style>
+:root{
+  --sage:#7c8b6f; --sage-d:#63715a; --cream:#f7f5f0; --ink:#2f332c;
+  --muted:#7a8073; --line:#e3e0d7; --card:#fff; --bubble-me:#7c8b6f; --warn:#b4543a;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sage:#9db08d; --sage-d:#b3c4a3; --cream:#1b1e19; --ink:#e8e9e4;
+  --muted:#9aa093; --line:#333830; --card:#232821; --bubble-me:#4f5c47;
+}}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+html,body{margin:0;height:100%}
+body{
+  background:var(--cream); color:var(--ink); font-size:16px; line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
+  display:flex; flex-direction:column;
+}
+header{
+  padding:14px 16px calc(14px + env(safe-area-inset-top)); background:var(--sage); color:#fff;
+  position:sticky; top:0; z-index:5;
+}
+header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px}
+header p{margin:2px 0 0;font-size:13px;opacity:.85}
+#log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;flex-direction:column;max-width:88%}
+.row.me{align-self:flex-end;align-items:flex-end}
+.row.bot{align-self:flex-start}
+.bub{
+  padding:11px 14px;border-radius:16px;white-space:pre-wrap;word-break:break-word;
+  border:1px solid var(--line);background:var(--card);
+}
+.row.me .bub{background:var(--bubble-me);color:#fff;border-color:transparent;border-bottom-right-radius:5px}
+.row.bot .bub{border-bottom-left-radius:5px}
+.bub a{color:var(--sage-d)}
+.meta{
+  margin-top:5px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;
+}
+.tag{border:1px solid var(--line);border-radius:999px;padding:1px 8px;background:var(--card)}
+.tag.warn{color:#fff;background:var(--warn);border-color:transparent}
+.tag.ok{color:var(--sage-d)}
+form{
+  display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0;
+}
+input{
+  flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 14px;border-radius:12px;
+  border:1px solid var(--line);background:var(--cream);color:var(--ink);
+}
+input:focus{outline:2px solid var(--sage);outline-offset:-1px}
+button{
+  font:inherit;font-weight:600;padding:11px 18px;border:0;border-radius:12px;
+  background:var(--sage);color:#fff;cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:default}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+}
+.dots span{
+  display:inline-block;width:6px;height:6px;margin-right:3px;border-radius:50%;
+  background:var(--muted);animation:b 1.2s infinite;
+}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1}}
+</style>
+</head>
+<body>
+<header>
+  <h1>소울매트 고객응대</h1>
+  <p>요가용품 · 수업/워크숍 문의를 도와드립니다</p>
+</header>
+
+<div class="chips" id="chips"></div>
+<div id="log"></div>
+
+<form id="f">
+  <input id="q" placeholder="무엇이든 물어보세요" autocomplete="off" required>
+  <button id="send">보내기</button>
+</form>
+
+<script>
+const log=document.getElementById('log'), f=document.getElementById('f'),
+      q=document.getElementById('q'), send=document.getElementById('send');
+let thread=null;
+
+const SAMPLES=["TPE 매트 두께가 몇 mm인가요?","싱잉볼 수업 자리 있나요?",
+  "행사 5일 전에 취소하면 얼마 돌려받나요?","SM-0002 지금 어디쯤 왔나요?",
+  "허리가 아픈데 아쉬탕가 해도 될까요?","7만원어치 사면 배송비 무료인가요?"];
+const chips=document.getElementById('chips');
+SAMPLES.forEach(t=>{
+  const b=document.createElement('button');
+  b.type='button'; b.className='chip'; b.textContent=t;
+  b.onclick=()=>{q.value=t; f.requestSubmit();};
+  chips.appendChild(b);
+});
+
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function linkify(s){return esc(s).replace(/(https?:\/\/[^\s<]+)/g,
+  '<a href="$1" target="_blank" rel="noopener">$1</a>');}
+
+function add(who, html, metaHtml){
+  const row=document.createElement('div'); row.className='row '+who;
+  const b=document.createElement('div'); b.className='bub'; b.innerHTML=html;
+  row.appendChild(b);
+  if(metaHtml){const m=document.createElement('div'); m.className='meta';
+    m.innerHTML=metaHtml; row.appendChild(m);}
+  log.appendChild(row); log.scrollTop=log.scrollHeight; return row;
+}
+
+f.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const text=q.value.trim(); if(!text) return;
+  q.value=''; send.disabled=true;
+  add('me', esc(text));
+  const wait=add('bot','<span class="dots"><span></span><span></span><span></span></span>');
+  try{
+    const r=await fetch('/api/chat',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:text, thread})});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json(); thread=d.thread;
+    wait.remove();
+    const tags=[`<span class="tag">${esc(d.route||'-')}</span>`,
+      `<span class="tag">확신도 ${(d.confidence??0).toFixed(2)}</span>`,
+      `<span class="tag">${esc(d.action||'-')}</span>`];
+    (d.tools||[]).forEach(t=>tags.push(`<span class="tag ok">${esc(t)}</span>`));
+    (d.violations||[]).forEach(v=>tags.push(`<span class="tag warn">⚠ ${esc(v)}</span>`));
+    add('bot', linkify(d.answer), tags.join(''));
+  }catch(err){
+    wait.remove();
+    add('bot','연결에 문제가 있습니다: '+esc(String(err.message||err)));
+  }finally{ send.disabled=false; q.focus(); }
+});
+
+add('bot','안녕하세요, 소울매트입니다. 상품·주문·배송·교환반품, 그리고 수업과 워크숍까지 도와드릴 수 있어요.\n위의 예시를 눌러 보셔도 됩니다.');
+</script>
+</body>
+</html>

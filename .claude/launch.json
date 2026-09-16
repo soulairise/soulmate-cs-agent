@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "soulmate-cs-web",
+      "runtimeExecutable": "./run.sh",
+      "runtimeArgs": ["web"],
+      "port": 8848
+    }
+  ]
+}

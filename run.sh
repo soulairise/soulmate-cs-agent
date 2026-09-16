@@ -22,5 +22,6 @@ cmd="${1:-chat}"; shift || true
 case "$cmd" in
   eval) exec .venv/bin/python src/evaluate.py "$@" ;;
   chat) exec .venv/bin/python src/chat.py ;;
-  *)    echo "사용법: ./run.sh [chat|eval]" >&2; exit 1 ;;
+  web)  exec .venv/bin/python -m uvicorn web:app --app-dir src --port 8848 "$@" ;;
+  *)    echo "사용법: ./run.sh [chat|eval|web]" >&2; exit 1 ;;
 esac
