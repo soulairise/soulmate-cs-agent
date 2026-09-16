@@ -24,7 +24,30 @@ from config import BASE, LABELS
 
 
 # ───────────────────────── ① 의도 분류 ─────────────────────────
-def eval_router(report=True, include_other=False):
+def eval_router(report=True, include_other=False, repeat=1):
+    """repeat>1 이면 같은 설정으로 여러 번 재고 평균과 폭을 함께 낸다.
+
+    ② 에만 반복을 붙여 두고 ① 은 한 번만 재서 비교해 왔는데, 잘못이다. 분류도 LLM 호출이라
+    같은 방식으로 흔들린다. 같은 잣대를 대야 한다.
+    """
+    if repeat > 1:
+        import statistics
+        accs, f1s, recalls = [], [], []
+        for i in range(repeat):
+            r = eval_router(report=False, include_other=include_other, repeat=1)
+            accs.append(r["acc"]); f1s.append(r["macro_f1"])
+            if "outscope_recall" in r:
+                recalls.append(r["outscope_recall"])
+            print(f"  {i + 1}회차 정확도 {r['acc']:.3f} · macro F1 {r['macro_f1']:.3f}")
+        print(f"\n[{repeat}회 평균] 정확도 {statistics.mean(accs):.3f} "
+              f"(폭 {max(accs) - min(accs):.3f}) · "
+              f"macro F1 {statistics.mean(f1s):.3f} (폭 {max(f1s) - min(f1s):.3f})")
+        out = {"acc": statistics.mean(accs), "macro_f1": statistics.mean(f1s),
+               "acc_spread": max(accs) - min(accs)}
+        if recalls:
+            out["outscope_recall"] = statistics.mean(recalls)
+        return out
+
     from router import app
 
     df = pd.read_csv(BASE / "inquiries_soulmate.csv").fillna("")
@@ -73,7 +96,16 @@ AUTO_ACTIONS = {"ANSWER", "ASK", "OUT_OF_SCOPE"}
 
 
 def norm_num(s):
-    return re.sub(r"(?<=\d),(?=\d)", "", str(s))
+    """숫자 표기를 한 가지로 맞춘다.
+
+    사람은 "10,000원"도 "1만 원"도 쓴다. 문자 그대로 대조하면 맞는 답이 떨어진다
+    (실제로 "2만 원 중 1만 원"이 must "10000" 에 걸렸다). 채점기 문제지 에이전트 문제가 아니다.
+    """
+    t = re.sub(r"(?<=\d),(?=\d)", "", str(s))          # 10,000 → 10000
+    t = re.sub(r"(\d+)\s*만\s*(\d+)\s*천", lambda m: str(int(m[1]) * 10000 + int(m[2]) * 1000), t)
+    t = re.sub(r"(\d+)\s*만", lambda m: str(int(m[1]) * 10000), t)
+    t = re.sub(r"(\d+)\s*천", lambda m: str(int(m[1]) * 1000), t)
+    return t
 
 
 def score_turn(expect, answer, tools_called, action):
@@ -86,8 +118,13 @@ def score_turn(expect, answer, tools_called, action):
     if need - set(tools_called):
         fails.append(f'tools 미호출: {sorted(need - set(tools_called))}')
     for m in expect.get("must", []):
-        if norm_num(m) not in a:
-            fails.append(f'must 누락: "{m}"')
+        # 리스트면 '이 중 하나라도 있으면 통과'. 같은 뜻을 다르게 쓰는 걸 허용하기 위한 것이지,
+        # 틀린 답을 통과시키기 위한 게 아니다. 새 표현을 넣을 땐 그게 정말 같은 뜻인지 본다.
+        #   예) "단품 구매 불가" 는 "판매하지 않습니다" / "세트로만" 으로도 쓴다 → 같은 뜻
+        #       "10000원 환불" 을 "전액 환불" 로 바꾸는 건 다른 뜻 → 넣지 않는다
+        opts = m if isinstance(m, list) else [m]
+        if not any(norm_num(o) in a for o in opts):
+            fails.append(f'must 누락: {m}')
     for f in expect.get("forbid", []):
         if norm_num(f) in a:
             fails.append(f'forbid 위반: "{f}"')
@@ -262,7 +299,8 @@ if __name__ == "__main__":
 
     out = {}
     if args.only in (None, "router"):
-        out["router"] = eval_router(report=not args.quiet, include_other=args.with_other)
+        out["router"] = eval_router(report=not args.quiet, include_other=args.with_other,
+                                    repeat=args.repeat)
         print()
     if args.only in (None, "answer", "safety"):
         a = eval_answer(report=not args.quiet and args.only != "safety",
@@ -275,6 +313,8 @@ if __name__ == "__main__":
     if "router" in out:
         r = out["router"]
         print(f'  ① 의도 분류   정확도 {r["acc"]:.3f} · macro F1 {r["macro_f1"]:.3f}'
+              + (f' · {args.repeat}회 폭 {r["acc_spread"]:.3f}'
+                 if r.get("acc_spread") is not None else "")
               + (f' · 범위밖 탐지 {100 * r["outscope_recall"]:.0f}%'
                  if "outscope_recall" in r else ""))
     if "answer" in out:

@@ -134,3 +134,6 @@ Q132,이 매트 살게요.,ORDER_PLACE,fewshot,구매 의사
 Q133,준비물이 뭔가요?,CLASS_BOOKING,fewshot,세션 준비물
 Q134,구성품이 뭔가요?,PRODUCT_INFO,fewshot,상품 구성
 Q135,몇 명까지 되나요?,CLASS_BOOKING,fewshot,정원
+Q136,행사 5일 전에 취소하면 얼마 돌려받나요?,CLASS_BOOKING,eval,7.3 취소·환불 확정 후 추가
+Q137,제가 못 가는데 친구가 대신 가도 되나요?,CLASS_BOOKING,eval,7.3 취소·환불 확정 후 추가
+Q138,입금한 지 이틀 됐는데 수업 취소하고 싶어요,CLASS_BOOKING,eval,7.3 취소·환불 확정 후 추가

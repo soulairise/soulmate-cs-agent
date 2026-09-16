@@ -61,6 +61,12 @@ CONFIRMED_POLICY = {
     "defect_months": 3,                 # 5장 [확정]
     "session_fee": 20000,               # 7장 [확정] 가을 요가 위켄드 기본 참가비
     "session_fee_potluck": 10000,       # 7장 [확정] 포트락 준비 시
+    # 7.3 수업 취소·환불 — 2026-09-16 대표 확정
+    "refund_full_before_days": 7,       # D-7 이전 전액
+    "refund_half_from_days": 3,         # D-6 ~ D-3 는 50%
+    "refund_half_to_days": 6,
+    "refund_none_within_days": 2,       # D-2 ~ 당일 환불 없음
+    "transfer_deadline_days": 3,        # 명의 양도는 D-3 까지
 }
 
 PROVISIONAL_POLICY = {

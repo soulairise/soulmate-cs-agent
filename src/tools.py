@@ -208,6 +208,70 @@ def get_event_info() -> dict:
     return out
 
 
+def get_class_refund_policy(session_id: Optional[str] = None,
+                           days_before: Optional[int] = None,
+                           paid_amount: Optional[int] = None,
+                           days_since_payment: Optional[int] = None) -> dict:
+    """수업·워크숍 취소 시 환불 규정과 환불액을 조회한다 (매뉴얼 7.3 · 7.4).
+
+    days_before 는 행사일까지 남은 일수다. 모르면 비워 두고, 돌려받은 tiers 를 안내한 뒤
+    언제 취소하시는지 되물으면 된다. 상품 반품(get_return_policy)과 혼동하지 말 것.
+    """
+    C = CONFIRMED_POLICY
+    out = {
+        "tiers": [
+            {"when": f"행사 {C['refund_full_before_days']}일 전까지", "refund_rate": 1.0},
+            {"when": f"{C['refund_half_from_days']}~{C['refund_half_to_days']}일 전",
+             "refund_rate": 0.5},
+            {"when": f"{C['refund_none_within_days']}일 전 ~ 당일 (노쇼 포함)",
+             "refund_rate": 0.0},
+        ],
+        "overrides": [
+            "취소석을 대기자가 채우면 시점과 무관하게 전액 환불",
+            "소울매트·소울라이즈 사정으로 세션이 취소되면 전액 환불",
+            f"행사 {C['transfer_deadline_days']}일 전까지 오픈채팅방으로 알리면 명의 양도 가능"
+            " (양도는 취소가 아니라 환불이 없다)",
+        ],
+        "not_a_cancellation": "우천 등으로 장소만 변경되는 경우는 취소 사유가 아니다",
+        "withdrawal_days": C["withdrawal_days"],
+        "withdrawal_note": ("입금일부터 7일 이내면 위 단계와 무관하게 전액 환불이다"
+                            " (전자상거래법 제17조). 수업이 시작된 뒤에는 철회할 수 없다."),
+    }
+
+    if days_since_payment is not None and days_since_payment <= C["withdrawal_days"]:
+        out["applies"] = "청약철회"
+        out["refund_rate"] = 1.0
+        out["reason"] = f"입금 후 {days_since_payment}일째라 청약철회 기간(7일) 안이다"
+    elif days_before is not None:
+        if days_before >= C["refund_full_before_days"]:
+            rate, tier = 1.0, f"{C['refund_full_before_days']}일 전까지"
+        elif days_before >= C["refund_half_from_days"]:
+            rate, tier = 0.5, f"{C['refund_half_from_days']}~{C['refund_half_to_days']}일 전"
+        else:
+            rate, tier = 0.0, f"{C['refund_none_within_days']}일 전 ~ 당일"
+        out.update({"applies": "환불 단계", "days_before": days_before,
+                    "tier": tier, "refund_rate": rate})
+        out["transfer_available"] = days_before >= C["transfer_deadline_days"]
+
+    if paid_amount is not None and "refund_rate" in out:
+        out["paid_amount"] = paid_amount
+        out["refund_amount"] = int(paid_amount * out["refund_rate"])
+
+    if session_id:
+        sess = SESSIONS.get(session_id)
+        if not sess:
+            out["session_error"] = "세션을 찾을 수 없습니다"
+        else:
+            out["session_id"] = session_id
+            out["session_title"] = sess["title"]
+            out["waitlist"] = sess.get("waitlist", 0)
+            if sess.get("waitlist", 0) > 0:
+                out["waitlist_note"] = (
+                    f"대기자가 {sess['waitlist']}명 있어 취소석이 바로 채워질 가능성이 높습니다. "
+                    "충원되면 시점과 무관하게 전액 환불됩니다.")
+    return out
+
+
 # ── 이관 ────────────────────────────────────────────────────────
 def escalate_to_agent(reason: str, context: Optional[dict] = None) -> dict:
     """사람 상담원에게 넘긴다. 건강·의료 판단, 확신도 미달, 비용 이견일 때 부른다."""
@@ -219,6 +283,6 @@ TOOLS = {f.__name__: f for f in [
     search_product, get_product_detail, get_product_options, get_restock_info,
     get_order_status, get_shipping_policy,
     get_return_policy, get_return_status,
-    search_session, get_session_detail, get_event_info,
+    search_session, get_session_detail, get_event_info, get_class_refund_policy,
     escalate_to_agent,
 ]}

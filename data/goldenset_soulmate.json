@@ -225,10 +225,16 @@
        "get_product_options"
       ],
       "must": [
-       "불가"
+       [
+        "불가",
+        "어렵",
+        "판매하지 않",
+        "세트로만"
+       ]
       ],
       "forbid": [],
-      "reference": "시그니처 요가복 세트는 탑과 레깅스를 세트로만 판매하여 레깅스 단품 구매는 불가합니다."
+      "reference": "시그니처 요가복 세트는 탑과 레깅스를 세트로만 판매하여 레깅스 단품 구매는 불가합니다.",
+      "_must_why": "단품 구매가 안 된다"
      }
     }
    ]
@@ -304,10 +310,15 @@
        "get_order_status"
       ],
       "must": [
-       "결제완료"
+       [
+        "결제완료",
+        "출고 전",
+        "출고되지"
+       ]
       ],
       "forbid": [],
-      "reference": "SM-0001 주문은 아직 결제완료 단계로 출고 전이라 색상 변경이 가능합니다. 차콜로 변경 접수해 드리겠습니다."
+      "reference": "SM-0001 주문은 아직 결제완료 단계로 출고 전이라 색상 변경이 가능합니다. 차콜로 변경 접수해 드리겠습니다.",
+      "_must_why": "출고 전이라 변경 가능하다"
      }
     }
    ]
@@ -970,6 +981,143 @@
       "must": [],
       "forbid": [],
       "reference": "문의하신 내용은 소울매트에서 확인이 어려운 사항입니다. 담당 창구를 안내해 드릴 수 있도록 상담원에게 연결해 드리겠습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-040",
+   "route": "CLASS_BOOKING",
+   "note": "7.3 — 양도를 먼저 안내해야 한다",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "수업 신청했는데 못 가게 됐어요. 환불되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_class_refund_policy"
+      ],
+      "must": [
+       [
+        "대신 참석",
+        "명의 양도",
+        "양도"
+       ]
+      ],
+      "forbid": [],
+      "reference": "못 오시게 되셨다면 행사 3일 전까지 오픈채팅방으로 알려주시면 다른 분이 대신 참석하실 수 있습니다. 환불을 원하시면 행사 7일 전까지는 전액, 3~6일 전은 50%, 2일 전부터는 환불이 어렵습니다.",
+      "_must_why": "양도가 가능함을 알렸다"
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-041",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "행사 5일 전에 취소하면 2만원 중 얼마 돌려받나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_class_refund_policy"
+      ],
+      "must": [
+       "10000"
+      ],
+      "forbid": [],
+      "reference": "행사 5일 전 취소는 50% 환불 구간이라 20,000원 중 10,000원을 돌려받으십니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-042",
+   "route": "CLASS_BOOKING",
+   "note": "7.4 — 청약철회가 환불 단계보다 우선한다",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "그저께 입금했는데 취소하고 싶어요. 행사는 모레예요."
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_class_refund_policy"
+      ],
+      "must": [
+       "전액"
+      ],
+      "forbid": [
+       "환불이 어렵"
+      ],
+      "reference": "입금하신 지 7일이 지나지 않아 청약철회 기간에 해당하므로, 행사가 이틀 뒤여도 전액 환불됩니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-043",
+   "route": "CLASS_BOOKING",
+   "note": "",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "제가 못 가는데 친구가 대신 가도 되나요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_class_refund_policy"
+      ],
+      "must": [
+       "3일"
+      ],
+      "forbid": [],
+      "reference": "네, 행사 3일 전까지 오픈채팅방으로 알려주시면 다른 분이 대신 참석하실 수 있습니다."
+     }
+    }
+   ]
+  },
+  {
+   "conv_id": "C-044",
+   "route": "CLASS_BOOKING",
+   "note": "7.3 — 대기자 충원이 단계보다 우선",
+   "turns": [
+    {
+     "role": "customer",
+     "text": "싱잉볼 수업 5일 전에 취소하면 환불 얼마인가요?"
+    },
+    {
+     "role": "agent",
+     "expect": {
+      "action": "ANSWER",
+      "tools": [
+       "get_class_refund_policy"
+      ],
+      "must": [
+       [
+        "대기",
+        "충원",
+        "취소석"
+       ]
+      ],
+      "forbid": [],
+      "reference": "싱잉볼 뇌파체험은 대기자가 계셔서 취소석이 채워지면 시점과 무관하게 전액 환불됩니다. 충원되지 않으면 5일 전 취소는 50% 환불 구간입니다.",
+      "_must_why": "대기자 충원이 우선임을 알렸다"
      }
     }
    ]
