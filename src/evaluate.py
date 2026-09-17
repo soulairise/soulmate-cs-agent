@@ -133,6 +133,65 @@ def score_turn(expect, answer, tools_called, action):
     return (not fails), fails
 
 
+def score_two_axes(expect, answer, tools_called):
+    """과제가 요구하는 **두 지표를 따로** 낸다.
+
+    `score_turn` 은 action·tools·must·forbid 를 묶어 한 점수로 낸다. 배포 가능 여부를
+    판단할 때는 그게 맞다 — 하나라도 어긋나면 내보내면 안 되니까.
+    그런데 그 방식으로는 **무엇을 고쳐야 하는지**가 안 보인다. 조회를 못 한 것과
+    조회는 했는데 말을 잘못한 것은 원인도 대책도 다르다.
+
+    ── 도구 호출 적절성
+    기대 도구 집합과 **정확히 일치**해야 1점이다. 누락만 보지 않고 과잉도 본다.
+    `score_turn` 은 `need - called` 만 봐서 관련 없는 도구를 더 부른 것을 놓쳤다.
+    쓸데없는 조회는 비용이고 지연이며, 엉뚱한 근거가 프롬프트에 섞여 오답을 만든다.
+
+    ── 답변 적절성
+    must 를 전부 담고 forbid 를 하나도 어기지 않으면 1점. 표현은 보지 않는다.
+    (`norm_num` 이 "1만 원"과 "10,000원"을 같게 만들고, must 가 리스트면 하나만 맞아도 된다)
+    """
+    a = norm_num(answer)
+    need, called = set(expect.get("tools", [])), set(tools_called)
+
+    missing, extra = sorted(need - called), sorted(called - need)
+    tool_ok = not missing and not extra
+
+    missed_must = [m for m in expect.get("must", [])
+                   if not any(norm_num(o) in a for o in (m if isinstance(m, list) else [m]))]
+    broke_forbid = [f for f in expect.get("forbid", []) if norm_num(f) in a]
+    answer_ok = not missed_must and not broke_forbid
+
+    return {"tool_ok": tool_ok, "answer_ok": answer_ok,
+            "missing": missing, "extra": extra,
+            "missed_must": missed_must, "broke_forbid": broke_forbid}
+
+
+def report_two_axes(rows, title="두 지표"):
+    """`score_two_axes` 결과 목록을 표로 낸다."""
+    n = len(rows)
+    if not n:
+        return {}
+    t = sum(r["tool_ok"] for r in rows)
+    a = sum(r["answer_ok"] for r in rows)
+    both = sum(r["tool_ok"] and r["answer_ok"] for r in rows)
+    print(f"── {title} ─────────────────────────────")
+    print(f"  도구 호출 적절성  {t}/{n}  ({100 * t / n:.1f}%)")
+    print(f"  답변 적절성      {a}/{n}  ({100 * a / n:.1f}%)")
+    print(f"  둘 다 통과       {both}/{n}  ({100 * both / n:.1f}%)")
+
+    # 원인을 쪼개 보여 준다. 조회 실패는 대개 must 누락을 함께 만들기 때문에,
+    # 둘을 따로 세면 같은 문제를 두 번 세게 된다. 원인은 도구 쪽에 있다.
+    miss = sum(1 for r in rows if r["missing"])
+    extra = sum(1 for r in rows if r["extra"])
+    fb = sum(1 for r in rows if r["broke_forbid"])
+    mm = sum(1 for r in rows if r["missed_must"])
+    print(f"\n  [원인] 도구 누락 {miss}건 · 도구 과잉 {extra}건 · "
+          f"must 누락 {mm}건 · forbid 위반 {fb}건")
+    if fb:
+        print("  ⚠ forbid 위반은 0 이어야 한다. 조회 전에 수치를 단정했다는 뜻이다.")
+    return {"tool_rate": t / n, "answer_rate": a / n, "both_rate": both / n, "n": n}
+
+
 def load_cases():
     gold = json.loads((BASE / "goldenset_soulmate.json").read_text(encoding="utf-8"))
     cases = []
@@ -220,16 +279,22 @@ def eval_answer(report=True, repeat=1):
     scored = [c for c in cases if c["expect"]["action"] in AUTO_ACTIONS]
     outs = pmap(run_case, scored)
 
-    rows = []
+    rows, axes = [], []
     for c, (action, text, tools) in zip(scored, outs):
         ok, fails = score_turn(c["expect"], text, tools, action)
+        ax = score_two_axes(c["expect"], text, tools)
+        ax["conv"] = c["conv_id"]
+        axes.append(ax)
         rows.append({"conv": c["conv_id"], "route": c["route"],
                      "기대": c["expect"]["action"], "실제": action,
                      "ok": ok, "fails": "; ".join(fails), "answer": text,
-                     "question": c["question"], "tools": tools})
+                     "question": c["question"], "tools": tools,
+                     "tool_ok": ax["tool_ok"], "answer_ok": ax["answer_ok"]})
     res = pd.DataFrame(rows)
     rate = res["ok"].mean()
     print(f'채점 {len(res)}건 / 통과 {res["ok"].sum()}건 ({100 * rate:.1f}%)')
+    print()
+    two = report_two_axes(axes, "두 지표 (과제 요구 형식)")
 
     if report:
         print("\n[라우트별]")
@@ -245,7 +310,7 @@ def eval_answer(report=True, repeat=1):
             print(f'  {r["conv"]} {r["route"]} 기대={r["기대"]} 실제={r["실제"]}  {r["fails"][:90]}')
             print(f'      답변: {r["answer"][:100]}')
 
-    return {"pass_rate": rate, "n": len(res), "frame": res}
+    return {"pass_rate": rate, "n": len(res), "frame": res, "two_axes": two}
 
 
 # ───────────────────────── ③ 안전 점검 ─────────────────────────
