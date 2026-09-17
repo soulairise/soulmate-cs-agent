@@ -56,13 +56,16 @@ route → answer → guard → (END | answer 재시도 | escalate)
 | `data/inquiries_soulmate.csv` | 라우팅 평가셋 138건 (eval 103 / outscope 15 / fewshot 20) |
 | `data/goldenset_soulmate.json` | 답변 정답셋 44건 (모범 답안 포함) |
 
-## 돌려보기
+## 새 컴퓨터에서 처음 받았다면
 
 ```bash
-uv venv && uv pip install -r requirements.txt
-export OPENAI_API_KEY=...        # 키는 저장소에 넣지 않는다
-cd src && python evaluate.py --repeat 3
+./setup.sh
 ```
+
+파이썬·가상환경·패키지·키 자리·데이터를 한 번에 점검한다. **키는 넣어 주지 않는다** —
+어디에 무엇을 넣어야 하는지만 알려준다. 키가 없으면 그 자리에서 명령을 출력해 준다.
+
+## 돌려보기
 
 ```bash
 ./run.sh              # 터미널에서 대화
@@ -77,7 +80,7 @@ cd src && python evaluate.py --repeat 3
 `~/.config/soulmate-cs-agent/env` 의 `SM_WEB_CODE` 가 접속코드다. 이 값이 있으면
 `/api/chat` 이 코드 없는 호출을 401 로 막는다. **없으면 아무나 호출해 API 크레딧을 쓴다.**
 
-목업의 계좌·연락처·신청 주소는 전부 **가짜 값**으로 바꿔 두었다(2026-09-16).
+목업의 계좌·연락처·신청 주소·**강사명**은 전부 **가짜 값**으로 바꿔 두었다(2026-09-16~17).
 실제 값은 행사 페이지에만 있고 이 저장소에는 없다. 화면 상단에도 데모 표시를 띄운다.
 
 **만들면 반드시 직접 말을 걸어 볼 것.** 지표 세 개가 전부 통과하는데도 대화에서는

@@ -10,7 +10,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from answer import answer_with_tools
-from guardrail import guardrail
+from guardrail import HEALTH_ASK, guardrail
 from router import app as router_app
 from tools import escalate_to_agent
 
@@ -41,9 +41,22 @@ def with_history(state: AgentState) -> str:
     return " ".join(prior + [state["question"]])
 
 
+HEALTH_MSG = ("수련 가능 여부는 몸 상태를 직접 보고 판단해야 하는 부분이라, "
+              "담당 강사님과 상담하실 수 있도록 연결해 드리겠습니다.")
+
+
 def node_route(state):
-    """① 분류 — 라우터 그래프를 그대로 부른다."""
-    r = router_app.invoke({"question": with_history(state)})
+    """① 분류 — 라우터 그래프를 그대로 부른다.
+
+    분류보다 **먼저** 건강·의료 **판단을 요구하는** 문의인지 본다 (HEALTH_ASK). 라우터가 이런 문의를 OTHER 로 보내면
+    답변 생성과 가드레일을 둘 다 건너뛰어(gate 가 바로 OUT_OF_SCOPE 로 끝낸다),
+    "저희 소관이 아닙니다" 라는 응대가 나간다. 실제로 그랬다.
+    안전망을 모델 판단에 맡기지 않고 여기서 규칙으로 잡는다.
+    """
+    q = with_history(state)
+    if HEALTH_ASK.search(q):
+        return {"route": "HEALTH", "confidence": 1.0, "action": "ESCALATE_HEALTH"}
+    r = router_app.invoke({"question": q})
     return {"route": r["route"], "confidence": r["confidence"], "action": r["action"]}
 
 
@@ -69,12 +82,19 @@ def node_guard(state: AgentState) -> AgentState:
 
 
 def node_escalate(state: AgentState) -> AgentState:
-    reason = {"ESCALATE": "분류확신도미달", "OUT_OF_SCOPE": "응대범위밖"}.get(
-        state["action"], "가드레일위반")
-    msg = ("문의하신 내용은 소울매트에서 확인이 어려운 사항입니다. 담당 창구를 안내해 드릴 수 있도록 상담원에게 연결해 드리겠습니다."
-           if state["action"] == "OUT_OF_SCOPE"
-           else escalate_to_agent(reason, {"q": state["question"]})["message"])
-    return {"answer": msg, "guardrail_ok": state.get("guardrail_ok")}
+    action = state["action"]
+    reason = {"ESCALATE": "분류확신도미달", "OUT_OF_SCOPE": "응대범위밖",
+              "ESCALATE_HEALTH": "건강·의료판단"}.get(action, "가드레일위반")
+    if action == "ESCALATE_HEALTH":
+        msg = HEALTH_MSG                      # 범위 밖 문구를 쓰면 안 된다 (매뉴얼 7.2)
+    elif action == "OUT_OF_SCOPE":
+        msg = ("문의하신 내용은 소울매트에서 확인이 어려운 사항입니다. "
+               "담당 창구를 안내해 드릴 수 있도록 상담원에게 연결해 드리겠습니다.")
+    else:
+        msg = escalate_to_agent(reason, {"q": state["question"]})["message"]
+    escalate_to_agent(reason, {"q": state["question"]})
+    return {"answer": msg, "tools": ["escalate_to_agent"],
+            "guardrail_ok": state.get("guardrail_ok")}
 
 
 def after_route(state: AgentState) -> str:
