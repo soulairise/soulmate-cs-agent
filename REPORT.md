@@ -307,24 +307,27 @@ flowchart TD
     HG -->|"건강·의료 판단 요구"| ESC
     HG -->|그 외| ROUTE
 
-    subgraph R["① 라우터 (router.py)"]
-        ROUTE["classify<br/>LLM · 구조화 출력<br/>route · confidence · reason"]
-        --> GATE{"gate<br/>confidence ≥ 0.5 ?<br/>route == OTHER ?"}
+    subgraph R["① 라우터 · router.py"]
+        ROUTE["classify — LLM 구조화 출력<br/>route · confidence · reason"]
+        GATE{"gate<br/>confidence 0.5 미만?<br/>route == OTHER?"}
+        ROUTE --> GATE
     end
 
     GATE -->|"HANDLE"| CTX
     GATE -->|"ESCALATE / OUT_OF_SCOPE"| ESC
 
-    subgraph A["② 근거 조립 + ③ 답변 (context.py · answer.py)"]
+    subgraph A["② 근거 조립 + ③ 답변 · context.py · answer.py"]
         CTX["build_context(route)<br/>매뉴얼에서 해당 장만"]
-        --> TOOLS["answer_with_tools<br/>모델이 스스로 도구 호출<br/>agent ⇄ tools 루프"]
-        --> GEN["ANSWER_RULES 로 생성"]
+        TOOLS["answer_with_tools<br/>모델이 스스로 도구 호출<br/>agent ⇄ tools 루프"]
+        GEN["ANSWER_RULES 로 생성"]
+        CTX --> TOOLS
+        TOOLS --> GEN
     end
 
     GEN --> GUARD
 
-    subgraph G["④ 검증 (guardrail.py)"]
-        GUARD{"guardrail 4중 점검<br/>① 출처 불명 수치<br/>② 건강 판단 단정<br/>③ 효능 표현<br/>④ 임시값 확답"}
+    subgraph G["④ 검증 · guardrail.py"]
+        GUARD{"guardrail 4중 점검<br/>출처 불명 수치<br/>건강 판단 단정<br/>효능 표현<br/>임시값 확답"}
     end
 
     GUARD -->|"통과"| OUT([고객에게 답변])
