@@ -56,6 +56,10 @@ route → answer → guard → (END | answer 재시도 | escalate)
 | `data/inquiries_soulmate.csv` | 라우팅 평가셋 138건 (eval 103 / outscope 15 / fewshot 20) |
 | `data/goldenset_soulmate.json` | 답변 정답셋 44건 (모범 답안 포함) |
 
+> **새 컴퓨터에서 이어서 하신다면 [HANDOFF.md](HANDOFF.md) 를 먼저 읽으세요.**
+> 어디까지 왔고, 무엇이 막혀 있고, 무엇을 이미 정했는지가 거기 있습니다.
+> 작업 규칙은 [CLAUDE.md](CLAUDE.md) — 새 Claude Code 세션이 자동으로 읽습니다.
+
 ## 새 컴퓨터에서 처음 받았다면
 
 ```bash
