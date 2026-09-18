@@ -4,3 +4,7 @@ langgraph
 pydantic
 scikit-learn
 pandas
+# 데모 화면(src/web.py · ./run.sh web) 에 필요하다.
+# 빠져 있어서 clone 한 사람이 데모를 못 띄웠다. (2026-09-18)
+fastapi
+uvicorn

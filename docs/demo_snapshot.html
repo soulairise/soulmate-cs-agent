@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>소울매트 고객응대</title>
+<style>
+:root{
+  --sage:#7c8b6f; --sage-d:#63715a; --cream:#f7f5f0; --ink:#2f332c;
+  --muted:#7a8073; --line:#e3e0d7; --card:#fff; --bubble-me:#7c8b6f; --warn:#b4543a;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sage:#9db08d; --sage-d:#b3c4a3; --cream:#1b1e19; --ink:#e8e9e4;
+  --muted:#9aa093; --line:#333830; --card:#232821; --bubble-me:#4f5c47;
+}}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+html,body{margin:0;height:100%}
+body{
+  background:var(--cream); color:var(--ink); font-size:16px; line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
+  display:flex; flex-direction:column;
+}
+header{
+  padding:14px 16px calc(14px + env(safe-area-inset-top)); background:var(--sage); color:#fff;
+  position:sticky; top:0; z-index:5;
+}
+header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px}
+header p{margin:2px 0 0;font-size:13px;opacity:.85}
+#log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;flex-direction:column;max-width:88%}
+.row.me{align-self:flex-end;align-items:flex-end}
+.row.bot{align-self:flex-start}
+.bub{
+  padding:11px 14px;border-radius:16px;white-space:pre-wrap;word-break:break-word;
+  border:1px solid var(--line);background:var(--card);
+}
+.row.me .bub{background:var(--bubble-me);color:#fff;border-color:transparent;border-bottom-right-radius:5px}
+.row.bot .bub{border-bottom-left-radius:5px}
+.bub a{color:var(--sage-d)}
+.meta{
+  margin-top:5px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;
+}
+.tag{border:1px solid var(--line);border-radius:999px;padding:1px 8px;background:var(--card)}
+.tag.warn{color:#fff;background:var(--warn);border-color:transparent}
+.tag.ok{color:var(--sage-d)}
+form{
+  display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0;
+}
+input{
+  flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 14px;border-radius:12px;
+  border:1px solid var(--line);background:var(--cream);color:var(--ink);
+}
+input:focus{outline:2px solid var(--sage);outline-offset:-1px}
+button{
+  font:inherit;font-weight:600;padding:11px 18px;border:0;border-radius:12px;
+  background:var(--sage);color:#fff;cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:default}
+.banner{
+  padding:9px 16px;font-size:13px;line-height:1.5;color:var(--muted);
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+.gate{padding:24px 16px;max-width:420px;margin:0 auto;text-align:center}
+.gate h2{font-size:17px;margin:0 0 6px}
+.gate p{font-size:14px;color:var(--muted);margin:0 0 16px}
+.gate form{border:0;padding:0;background:0;position:static}
+.gate .err{color:var(--warn);font-size:13px;margin-top:10px;min-height:19px}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+}
+.dots span{
+  display:inline-block;width:6px;height:6px;margin-right:3px;border-radius:50%;
+  background:var(--muted);animation:b 1.2s infinite;
+}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1}}
+</style>
+</head>
+<body>
+<header>
+  <h1>소울매트 고객응대</h1>
+  <p>요가용품 · 수업/워크숍 문의를 도와드립니다</p>
+</header>
+<div class="banner">이 파일은 2026-09-18 실제 실행 화면의 저장본입니다. 스크립트는 제거되어 있어 동작하지 않습니다.</div><div class="banner">데모입니다 — 계좌·연락처·신청 주소는 모두 가짜 값이고, 상품·주문·세션은 목업 데이터입니다.</div>
+
+<div class="gate" id="gate" hidden>
+  <h2>접속코드를 입력해 주세요</h2>
+  <p>팀원에게 공유된 코드를 넣으시면 됩니다.</p>
+  <form id="gf">
+    <input id="gc" placeholder="접속코드" autocomplete="off" required>
+    <button>확인</button>
+  </form>
+  <div class="err" id="ge"></div>
+</div>
+
+<div class="chips" id="chips"></div>
+<div id="log"><div class="row me"><div class="bub">행사 5일 전에 취소하면 얼마 돌려받나요?</div></div><div class="row bot"><div class="bub">행사 5일 전 취소는 실제 입금액의 50% 환불입니다. 다만 행사 3일 전까지 명의 양도가 가능하며, 입금 후 7일 이내라면 전액 환불됩니다.</div><div class="meta"><span class="tag">CLASS_BOOKING</span><span class="tag">확신도 0.98</span><span class="tag">ANSWER</span><span class="tag ok">get_class_refund_policy</span></div></div><div class="row me"><div class="bub">허리가 아픈데 아쉬탕가 해도 될까요?</div></div><div class="row bot"><div class="bub">수련 가능 여부는 몸 상태를 직접 보고 판단해야 하는 부분이라, 담당 강사님과 상담하실 수 있도록 연결해 드리겠습니다.</div><div class="meta"><span class="tag">HEALTH</span><span class="tag">확신도 1.00</span><span class="tag">ESCALATE_HEALTH</span><span class="tag ok">escalate_to_agent</span></div></div></div>
+
+<form id="f">
+  <input id="q" placeholder="무엇이든 물어보세요" autocomplete="off" required>
+  <button id="send">보내기</button>
+</form>
+
+
+</body>
+</html>
